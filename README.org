@@ -1,0 +1,3 @@
+#+TITLE: Energos's Anarchic Void Linux Notes Collection
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+STARTUP: showall
