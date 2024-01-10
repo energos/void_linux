@@ -1,3 +1,155 @@
 #+TITLE: Energos's Anarchic Void Linux Notes Collection
 #+OPTIONS: toc:nil num:nil html-postamble:nil
 #+STARTUP: showall
+
+* Install Void Linux
+- [[https://voidlinux.org/download/][Download Void Linux]]
+- [[https://docs.voidlinux.org/][Void Linux Handbook]]
+- [[https://docs.voidlinux.org/installation/guides/fde.html][Full Disk Encryption - Void Linux Handbook]]
+* USB UEFI with LUKS encryption
+** Boot install media in EFI mode
+- Test if efivars are available
+#+begin_src bash
+ls /sys/firmware/efi/efivars
+#+end_src
+- Small conveniences
+#+begin_src bash
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+#+end_src
+** Create partitions
+#+begin_src bash
+fdisk -l /dev/sdd
+#+end_src
+#+begin_example
+Disk /dev/sdd: 57.28 GiB, 61505273856 bytes, 120127488 sectors
+Disk model:  SanDisk 3.2Gen1
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 66D599E1-50CB-F342-8D2F-5AA51C1B9D0B
+
+Device         Start       End   Sectors  Size Type
+/dev/sdd1       2048    198655    196608   96M EFI System
+/dev/sdd2     198656 117639167 117440512   56G Linux filesystem
+/dev/sdd3  117639168 120125439   2486272  1.2G Microsoft basic data
+#+end_example
+** Encrypt root partition
+#+begin_src bash
+cryptsetup luksFormat --type luks1 /dev/sdd2
+cryptsetup luksOpen /dev/sdd2 voidvm
+#+end_src
+** Create lvm volumes
+#+begin_src bash
+vgcreate voidvm /dev/mapper/voidvm
+lvcreate --name swap -L 1G voidvm # optional
+lvcreate --name root -l 100%FREE voidvm
+#+end_src
+** Format Partitions
+#+begin_src bash
+mkfs.vfat -n EFI /dev/sdd1
+mkfs.vfat -n DUMPSTER /dev/sdd3
+mkswap -L SWAP /dev/voidvm/swap
+mkfs.ext4 -O "^has_journal" -L WilburyRoot /dev/voidvm/root
+#+end_src
+*** Write down the UUIDs
+#+begin_src bash
+lsblk /dev/sdd -f
+#+end_src
+#+begin_example
+NAME              FSTYPE      FSVER    LABEL       UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+sdd
+├─sdd1            vfat        FAT16    EFI         EC04-95D9                                95.8M     0% /mnt/boot/efi
+├─sdd2            crypto_LUKS 1                    3e307c1e-14cb-4361-93a5-ba28fa364c08
+│ └─voidvm        LVM2_member LVM2 001             YNS9Ql-uJJy-aR2Y-pivu-jV5l-Vw9y-wJecNp
+│   ├─voidvm-swap swap        1        SWAP        8c33051a-6a72-4139-a738-61e19d341a7e                  [SWAP]
+│   └─voidvm-root ext4        1.0      WilburyRoot dccba26d-a410-4652-8b78-41992a8a6b65     49.8G     3% /mnt
+└─sdd3            vfat        FAT32    DUMPSTER    EDD6-9199
+#+end_example
+#+begin_example
+LABEL=SWAP,        UUID=8c33051a-6a72-4139-a738-61e19d341a7e
+LABEL=WilburyRoot, UUID=dccba26d-a410-4652-8b78-41992a8a6b65
+LABEL=EFI,         UUID=EC04-95D9
+LABEL=DUMPSTER,    UUID=EDD6-9199
+#+end_example
+** Mount Partitions
+#+begin_src bash
+mount /dev/voidvm/root /mnt
+mkdir -p /mnt/boot/efi
+mount /dev/sdd1 /mnt/boot/efi
+swapon /dev/voidvm/swap
+#+end_src
+** Copy the keys
+#+begin_src bash
+mkdir -p /mnt/var/db/xbps/keys
+cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
+#+end_src
+** Install base system
+#+begin_src bash
+xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc
+#+end_src
+** Enter the chroot
+#+begin_src bash
+xchroot /mnt
+chown root:root /
+chmod 755 /
+passwd root
+echo wilbury > /etc/hostname
+echo -en "LANG=en_US.UTF-8\nLC_COLLATE=C\n" > /etc/locale.conf
+echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
+xbps-reconfigure -f glibc-locales
+#+end_src
+** Edit /etc/fstab
+#+begin_example
+#
+# See fstab(5).
+#
+# <file system>      <dir>     <type>  <options>               <dump> <pass>
+tmpfs                /tmp      tmpfs   defaults,nosuid,nodev   0      0
+
+/dev/voidvm/root     /         ext4    defaults,noatime,shared 0      1
+
+/dev/voidvm/swap     swap      swap    defaults                0      0
+
+UUID=EC04-95D9       /boot/efi vfat    defaults                0      2
+
+#+end_example
+** GRUB configuration
+#+begin_src bash
+blkid -o value -s UUID /dev/sdd2
+#+end_src
+#+begin_example
+3e307c1e-14cb-4361-93a5-ba28fa364c08
+#+end_example
+*** /etc/default/grub
+#+begin_example
+GRUB_ENABLE_CRYPTODISK=y
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=4 rd.lvm.vg=voidvm rd.luks.uuid=3e307c1e-14cb-4361-93a5-ba28fa364c08"
+#+end_example
+** LUKS key
+#+begin_src bash
+dd bs=1 count=64 if=/dev/urandom of=/boot/volume.key
+cryptsetup luksAddKey /dev/sdd2 /boot/volume.key
+chmod 000 /boot/volume.key
+chmod -R g-rwx,o-rwx /boot
+#+end_src
+*** /etc/crypttab
+#+begin_example
+voidvm   UUID=3e307c1e-14cb-4361-93a5-ba28fa364c08  /boot/volume.key  luks
+#+end_example
+*** /etc/dracut.conf.d/10-crypt.conf
+#+begin_example
+install_items+=" /boot/volume.key /etc/crypttab "
+#+end_example
+** Install boot loader
+#+begin_src bash
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id="Void" --removable /dev/sdd
+xbps-reconfigure -fa
+#+end_src
+** Here we goooo
+#+begin_src bash
+exit
+umount -R /mnt
+reboot
+#+end_src
