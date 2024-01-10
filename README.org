@@ -153,3 +153,87 @@ install_items+=" /boot/volume.key /etc/crypttab "
   umount -R /mnt
   reboot
 #+end_src
+* Configure your brand new Void Linux installation
+** Add an admin user
+#+begin_src bash
+  useradd -m -s /bin/bash -U -G wheel lefty
+  passwd lefty
+#+end_src
+** Enable networking and ssh server
+#+begin_src bash
+  ln -s /etc/sv/dhcpcd /var/service
+  ln -s /etc/sv/sshd /var/service
+#+end_src
+** Update system and add non free repository
+#+begin_src bash
+  xbps-install -Su
+  xbps-install void-repo-nonfree
+  xbps-install -S
+#+end_src
+** Change to a faster repository
+*** /etc/xbps.d/00-repository-main.conf
+#+begin_example
+# repository=https://repo-default.voidlinux.org/current
+repository=https://repo-de.voidlinux.org/current
+#+end_example
+*** /etc/xbps.d/10-repository-nonfree.conf
+#+begin_example
+# repository=https://repo-default.voidlinux.org/current/nonfree
+repository=https://repo-de.voidlinux.org/current/nonfree
+#+end_example
+*** Update database
+#+begin_src bash
+  xbps-install -S
+#+end_src
+** Console font and keymap
+Edit /etc/rc.conf
+#+begin_example
+KEYMAP=us-acentos
+FONT="ter-118b"
+#+end_example
+** Timezone
+#+begin_src bash
+  ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime
+#+end_src
+** LTS kernel
+Edit /etc/xbps.d/20-kernel_lts.conf
+#+begin_example
+ignorepkg=linux
+ignorepkg=linux-headers
+#+end_example
+#+begin_src bash
+  xbps-install linux-lts linux-lts-headers
+  xbps-remove linux linux-headers
+  update-grub
+#+end_src
+** Do not install helvetica fonts
+Edit /etc/xbps.d/99-helvetica.conf
+#+begin_example
+ignorepkg=font-adobe-100dpi
+ignorepkg=font-adobe-75dpi
+ignorepkg=font-adobe-utopia-100dpi
+ignorepkg=font-adobe-utopia-75dpi
+ignorepkg=font-adobe-utopia-type1
+#+end_example
+#+begin_src bash
+  xbps-remove font-adobe-100dpi font-adobe-75dpi font-adobe-utopia-100dpi font-adobe-utopia-75dpi font-adobe-utopia-type1
+#+end_src
+** Install the whole enchilada
+#+begin_src bash
+  xbps-install $(cat ~/packages.txt)
+#+end_src
+** Release user's full power
+#+begin_src bash
+  usermod -a -G wheel,users,audio,video,cdrom,input,dialout,kvm,plugdev,xbuilder,network,socklog lefty
+#+end_src
+
+
+* TODO TODO
+** Add to git repo
+- packages.txt
+- /etc/rc.conf
+- /etc/xbps.d/*
+  + 00-repository-main.conf
+  + 10-repository-nonfree.conf
+  + 20-kernel_lts.conf
+  + 99-helvetica.conf
