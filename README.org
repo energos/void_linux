@@ -207,6 +207,8 @@ ignorepkg=linux-headers
   update-grub
 #+end_src
 ** Do not install helvetica fonts
+Otherwise you'll get very ugly fonts in Firefox.
+
 Edit /etc/xbps.d/99-helvetica.conf
 #+begin_example
 ignorepkg=font-adobe-100dpi
