@@ -10,16 +10,16 @@
 ** Boot install media in EFI mode
 - Test if efivars are available
 #+begin_src bash
-ls /sys/firmware/efi/efivars
+  ls /sys/firmware/efi/efivars
 #+end_src
 - Small conveniences
 #+begin_src bash
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+  bind '"\e[A": history-search-backward'
+  bind '"\e[B": history-search-forward'
 #+end_src
 ** Create partitions
 #+begin_src bash
-fdisk -l /dev/sdd
+  fdisk -l /dev/sdd
 #+end_src
 #+begin_example
 Disk /dev/sdd: 57.28 GiB, 61505273856 bytes, 120127488 sectors
@@ -37,25 +37,25 @@ Device         Start       End   Sectors  Size Type
 #+end_example
 ** Encrypt root partition
 #+begin_src bash
-cryptsetup luksFormat --type luks1 /dev/sdd2
-cryptsetup luksOpen /dev/sdd2 voidvm
+  cryptsetup luksFormat --type luks1 /dev/sdd2
+  cryptsetup luksOpen /dev/sdd2 voidvm
 #+end_src
 ** Create lvm volumes
 #+begin_src bash
-vgcreate voidvm /dev/mapper/voidvm
-lvcreate --name swap -L 1G voidvm # optional
-lvcreate --name root -l 100%FREE voidvm
+  vgcreate voidvm /dev/mapper/voidvm
+  lvcreate --name swap -L 1G voidvm # optional
+  lvcreate --name root -l 100%FREE voidvm
 #+end_src
 ** Format Partitions
 #+begin_src bash
-mkfs.vfat -n EFI /dev/sdd1
-mkfs.vfat -n DUMPSTER /dev/sdd3
-mkswap -L SWAP /dev/voidvm/swap
-mkfs.ext4 -O "^has_journal" -L WilburyRoot /dev/voidvm/root
+  mkfs.vfat -n EFI /dev/sdd1
+  mkfs.vfat -n DUMPSTER /dev/sdd3
+  mkswap -L SWAP /dev/voidvm/swap
+  mkfs.ext4 -O "^has_journal" -L WilburyRoot /dev/voidvm/root
 #+end_src
 *** Write down the UUIDs
 #+begin_src bash
-lsblk /dev/sdd -f
+  lsblk /dev/sdd -f
 #+end_src
 #+begin_example
 NAME              FSTYPE      FSVER    LABEL       UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
@@ -75,30 +75,30 @@ LABEL=DUMPSTER,    UUID=EDD6-9199
 #+end_example
 ** Mount Partitions
 #+begin_src bash
-mount /dev/voidvm/root /mnt
-mkdir -p /mnt/boot/efi
-mount /dev/sdd1 /mnt/boot/efi
-swapon /dev/voidvm/swap
+  mount /dev/voidvm/root /mnt
+  mkdir -p /mnt/boot/efi
+  mount /dev/sdd1 /mnt/boot/efi
+  swapon /dev/voidvm/swap
 #+end_src
 ** Copy the keys
 #+begin_src bash
-mkdir -p /mnt/var/db/xbps/keys
-cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
+  mkdir -p /mnt/var/db/xbps/keys
+  cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 #+end_src
 ** Install base system
 #+begin_src bash
-xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc
+  xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc
 #+end_src
 ** Enter the chroot
 #+begin_src bash
-xchroot /mnt
-chown root:root /
-chmod 755 /
-passwd root
-echo wilbury > /etc/hostname
-echo -en "LANG=en_US.UTF-8\nLC_COLLATE=C\n" > /etc/locale.conf
-echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
-xbps-reconfigure -f glibc-locales
+  xchroot /mnt
+  chown root:root /
+  chmod 755 /
+  passwd root
+  echo wilbury > /etc/hostname
+  echo -en "LANG=en_US.UTF-8\nLC_COLLATE=C\n" > /etc/locale.conf
+  echo "en_US.UTF-8 UTF-8" >> /etc/default/libc-locales
+  xbps-reconfigure -f glibc-locales
 #+end_src
 ** Edit /etc/fstab
 #+begin_example
@@ -117,7 +117,7 @@ UUID=EC04-95D9       /boot/efi vfat    defaults                0      2
 #+end_example
 ** GRUB configuration
 #+begin_src bash
-blkid -o value -s UUID /dev/sdd2
+  blkid -o value -s UUID /dev/sdd2
 #+end_src
 #+begin_example
 3e307c1e-14cb-4361-93a5-ba28fa364c08
@@ -129,10 +129,10 @@ GRUB_CMDLINE_LINUX_DEFAULT="loglevel=4 rd.lvm.vg=voidvm rd.luks.uuid=3e307c1e-14
 #+end_example
 ** LUKS key
 #+begin_src bash
-dd bs=1 count=64 if=/dev/urandom of=/boot/volume.key
-cryptsetup luksAddKey /dev/sdd2 /boot/volume.key
-chmod 000 /boot/volume.key
-chmod -R g-rwx,o-rwx /boot
+  dd bs=1 count=64 if=/dev/urandom of=/boot/volume.key
+  cryptsetup luksAddKey /dev/sdd2 /boot/volume.key
+  chmod 000 /boot/volume.key
+  chmod -R g-rwx,o-rwx /boot
 #+end_src
 *** /etc/crypttab
 #+begin_example
@@ -144,12 +144,12 @@ install_items+=" /boot/volume.key /etc/crypttab "
 #+end_example
 ** Install boot loader
 #+begin_src bash
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id="Void" --removable /dev/sdd
-xbps-reconfigure -fa
+  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id="Void" --removable /dev/sdd
+  xbps-reconfigure -fa
 #+end_src
 ** Here we goooo
 #+begin_src bash
-exit
-umount -R /mnt
-reboot
+  exit
+  umount -R /mnt
+  reboot
 #+end_src
