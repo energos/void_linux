@@ -224,12 +224,103 @@ ignorepkg=font-adobe-utopia-type1
 #+begin_src bash
   xbps-install $(cat ~/packages.txt)
 #+end_src
+** Services
+#+begin_src bash
+  # ln -s /etc/sv/sshd /var/service
+  ln -s /etc/sv/acpid /var/service
+  ln -s /etc/sv/dbus /var/service
+  ln -s /etc/sv/nanoklogd /var/service
+  ln -s /etc/sv/polkitd /var/service
+  ln -s /etc/sv/socklog-unix /var/service
+#+end_src
 ** Release user's full power
 #+begin_src bash
   usermod -a -G wheel,users,audio,video,cdrom,input,dialout,kvm,plugdev,xbuilder,network,socklog lefty
 #+end_src
-
-
+* dotfiles, dotfiles, dotfiles
+** ssh keys
+- ~/.ssh/config
+- ~/.ssh/github_rsa
+- ~/.ssh/github_rsa.pub
+** Clone dotfiles repository
+#+begin_src bash
+  git clone git@github.com:energos/dotfiles
+#+end_src
+** copy /root dotfiles
+#+begin_src bash
+  su -
+  cp /home/lefty/Work/dotfiles/environment/root/bash_profile /root/.bash_profile
+  cp /home/lefty/Work/dotfiles/environment/root/bashrc /root/.bashrc
+  cp /home/lefty/Work/dotfiles/environment/root/inputrc /root/.inputrc
+  exit
+#+end_src
+** dotfiles symlinks galore
+#+begin_src bash
+  cd ~
+  ln -s Work/dotfiles/environment/Xresources .Xresources
+  mv .bash_profile .bash_profile.original
+  ln -s Work/dotfiles/environment/bash_profile .bash_profile
+  mv .bashrc .bashrc.original
+  ln -s Work/dotfiles/environment/bashrc .bashrc
+  ln -s Work/dotfiles/gitconfig .gitconfig
+  ln -s Work/dotfiles/.gitignore .gitignore
+  ln -s Work/dotfiles/gmrun/gmrunrc .gmrunrc
+  mv .inputrc .inputrc.original
+  ln -s Work/dotfiles/environment/inputrc .inputrc
+  ln -s Work/dotfiles/tmux/tmux.conf .tmux.conf
+  ln -s Work/dotfiles/environment/xbindkeysrc .xbindkeysrc
+  ln -s Work/dotfiles/environment/xinitrc .xinitrc
+  mkdir bin
+  ln -s ../Work/dotfiles/bin/bukumarks bin/bukumarks
+  ln -s ../Work/dotfiles/bin/emacs-git bin/emacs-git
+  ln -s ../Work/dotfiles/bin/emacs-nox bin/emacs-nox
+  ln -s ../Work/dotfiles/bin/hello-fortune bin/hello-fortune
+  ln -s ../Work/dotfiles/bin/nohup-open bin/nohup-open
+  ln -s ../Work/dotfiles/bin/pqp bin/pqp
+  ln -s ../Work/dotfiles/bin/urxvtcd bin/urxvtcd
+  mkdir .config/dunst
+  ln -s ../../Work/dotfiles/dunst/dunstrc .config/dunst/dunstrc
+  mkdir .config/mpv
+  ln -s ../../Work/dotfiles/mpv/input.conf .config/mpv/input.conf
+  ln -s ../../Work/dotfiles/mpv/mpv.conf .config/mpv/mpv.conf
+  mkdir .config/obmenu-generator
+  ln -s ../../Work/dotfiles/obmenu-generator/config.pl .config/obmenu-generator/config.pl
+  ln -s ../../Work/dotfiles/obmenu-generator/schema.pl .config/obmenu-generator/schema.pl
+  mkdir .config/openbox
+  ln -s ../../Work/dotfiles/openbox/autostart .config/openbox/autostart
+  ln -s ../../Work/dotfiles/openbox/environment .config/openbox/environment
+  ln -s ../../Work/dotfiles/openbox/menu.xml .config/openbox/menu.xml
+  ln -s ../../Work/dotfiles/openbox/menu_books.sh .config/openbox/menu_books.sh
+  ln -s ../../Work/dotfiles/openbox/menu_browsers.sh .config/openbox/menu_browsers.sh
+  ln -s ../../Work/dotfiles/openbox/menu_electronics.sh .config/openbox/menu_electronics.sh
+  ln -s ../../Work/dotfiles/openbox/menu_multimedia.sh .config/openbox/menu_multimedia.sh
+  ln -s ../../Work/dotfiles/openbox/menu_root.sh .config/openbox/menu_root.sh
+  ln -s ../../Work/dotfiles/openbox/menu_virtualization.sh .config/openbox/menu_virtualization.sh
+  ln -s ../../Work/dotfiles/openbox/rc.xml .config/openbox/rc.xml
+  ln -s ../Work/dotfiles/picom/picom.vmguest.conf .config/picom.conf
+  mkdir .config/rofi
+  ln -s ../../Work/dotfiles/rofi/config.rasi .config/rofi/config.rasi
+  mkdir .config/tint2
+  ln -s ../../Work/dotfiles/tint2/tint2rc .config/tint2/tint2rc
+  ln -s ../../Work/dotfiles/tint2/web-browser.desktop .config/tint2/web-browser.desktop
+  mkdir .config/youtube-dl
+  ln -s ../../Work/dotfiles/yt-dlp/config .config/youtube-dl/config
+  ln -s ../Work/dotfiles/baloo/baloofilerc .config/baloofilerc
+  mkdir .config/gtk-3.0
+  mkdir .config/qt5ct
+  ln -s ../../Work/dotfiles/appearance/gtk-3.0/gtk.css .config/gtk-3.0/gtk.css
+  cp Work/dotfiles/appearance/gtkrc-2.0 .gtkrc-2.0
+  cp Work/dotfiles/appearance/gtk-3.0/settings.ini .config/gtk-3.0/settings.ini
+  cp Work/dotfiles/appearance/qt5ct/qt5ct.conf .config/qt5ct/qt5ct.conf
+  cd $YOUR_FIREFOX_PROFILE
+  ln -s ../../../Work/dotfiles/mozilla/user.js user.js
+  mkdir chrome
+  ln -s ../../../../Work/dotfiles/mozilla/disable_proton.css chrome/disable_proton.css
+  ln -s ../../../../Work/dotfiles/mozilla/tabs_on_bottom.css chrome/tabs_on_bottom.css
+  ln -s ../../../../Work/dotfiles/mozilla/userChrome.css chrome/userChrome.css
+  ln -s ../../../../Work/dotfiles/mozilla/userContent.css chrome/userContent.css
+  cd ~
+#+end_src
 * TODO TODO
 ** Add to git repo
 - packages.txt
