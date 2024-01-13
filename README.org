@@ -322,6 +322,8 @@ ignorepkg=font-adobe-utopia-type1
   cd ~
   mkdir -p .config/pipewire/pipewire.conf.d
   ln -s ../../../Work/dotfiles/pipewire/pipewire.conf.d/11-beep.conf .config/pipewire/pipewire.conf.d/11-beep.conf
+  mkdir -p .local/share/icons
+  for i in Work/dotfiles/icons/*; do ln -s ../../../$i .local/share/icons/$(basename $i); done
 #+end_src
 * TODO TODO
 ** Add to git repo
