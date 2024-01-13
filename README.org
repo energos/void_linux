@@ -335,3 +335,13 @@ ignorepkg=font-adobe-utopia-type1
   + 10-repository-nonfree.conf
   + 20-kernel_lts.conf
   + 99-helvetica.conf
+** Icons
+- 512_void.webp / os-logo.png
+** default applications
+** .desktop
+** books
+** datasheets
+** eagle
+** arduino
+** esp-idf
+** connman
