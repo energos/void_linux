@@ -312,6 +312,15 @@ ignorepkg=font-adobe-utopia-type1
   cp Work/dotfiles/appearance/gtkrc-2.0 .gtkrc-2.0
   cp Work/dotfiles/appearance/gtk-3.0/settings.ini .config/gtk-3.0/settings.ini
   cp Work/dotfiles/appearance/qt5ct/qt5ct.conf .config/qt5ct/qt5ct.conf
+  mkdir -p .config/pipewire/pipewire.conf.d
+  ln -s ../../../Work/dotfiles/pipewire/pipewire.conf.d/11-beep.conf .config/pipewire/pipewire.conf.d/11-beep.conf
+  mkdir -p .local/share/icons
+  for i in Work/dotfiles/icons/*; do ln -s ../../../$i .local/share/icons/$(basename $i); done
+  mkdir -p .local/share/applications
+#+end_src
+* Housekeeping
+** Firefox
+#+begin_src bash
   cd $YOUR_FIREFOX_PROFILE
   ln -s ../../../Work/dotfiles/mozilla/user.js user.js
   mkdir chrome
@@ -320,11 +329,19 @@ ignorepkg=font-adobe-utopia-type1
   ln -s ../../../../Work/dotfiles/mozilla/userChrome.css chrome/userChrome.css
   ln -s ../../../../Work/dotfiles/mozilla/userContent.css chrome/userContent.css
   cd ~
-  mkdir -p .config/pipewire/pipewire.conf.d
-  ln -s ../../../Work/dotfiles/pipewire/pipewire.conf.d/11-beep.conf .config/pipewire/pipewire.conf.d/11-beep.conf
-  mkdir -p .local/share/icons
-  for i in Work/dotfiles/icons/*; do ln -s ../../../$i .local/share/icons/$(basename $i); done
-  mkdir -p .local/share/applications
+#+end_src
+** /etc/hosts
+#+begin_example
+192.168.x.xx1           moe
+192.168.x.xx2           larry
+192.168.x.xx3           curly
+192.168.x.xx4           shemp
+#+end_example
+** Emacs
+** Fonts
+#+begin_src bash
+mkdir -p .local/share/fonts
+ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
 #+end_src
 * TODO TODO
 ** Add to git repo
