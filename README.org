@@ -338,6 +338,13 @@ ignorepkg=font-adobe-utopia-type1
 192.168.x.xx4           shemp
 #+end_example
 ** Emacs
+#+begin_src bash
+  mkdir -p .emacs.d/lisp
+  for i in Work/dotfiles/emacs/lisp/*; do ln -s ../../$i .emacs.d/lisp/$(basename $i); done
+  mkdir -p .emacs.d/themes
+  # for i in Work/dotfiles/emacs/themes/*; do ln -s ../../$i .emacs.d/themes/$(basename $i); done
+  ln -s ../Work/dotfiles/emacs/init.el .emacs.d/init.el
+#+end_src
 ** Fonts
 #+begin_src bash
 mkdir -p .local/share/fonts
