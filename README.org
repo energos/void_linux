@@ -87,7 +87,7 @@ LABEL=DUMPSTER,    UUID=EDD6-9199
 #+end_src
 ** Install base system
 #+begin_src bash
-  xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc
+  xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc terminus-font xtools bash-completion
 #+end_src
 ** Enter the chroot
 #+begin_src bash
@@ -127,6 +127,33 @@ UUID=EC04-95D9       /boot/efi vfat    defaults                0      2
 GRUB_ENABLE_CRYPTODISK=y
 GRUB_CMDLINE_LINUX_DEFAULT="loglevel=4 rd.lvm.vg=voidvm rd.luks.uuid=3e307c1e-14cb-4361-93a5-ba28fa364c08"
 #+end_example
+*** /etc/grub.d/40_custom
+#+begin_src bash
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+
+
+menuentry "================================================================================" {
+        true
+}
+
+menuentry "System restart" {
+        echo "System rebooting..."
+        reboot
+}
+
+menuentry "Firmware setup" {
+        fwsetup
+}
+
+menuentry "System shutdown" {
+        echo "System shutting down..."
+        halt
+}
+#+end_src
 ** LUKS key
 #+begin_src bash
   dd bs=1 count=64 if=/dev/urandom of=/boot/volume.key
@@ -149,11 +176,22 @@ install_items+=" /boot/volume.key /etc/crypttab "
 #+end_src
 ** Here we goooo
 #+begin_src bash
+  chsh -s /bin/bash
   exit
   umount -R /mnt
   reboot
 #+end_src
 * Configure your brand new Void Linux installation
+** Console font and keymap
+#+begin_src bash
+  loadkeys us-acentos
+  setfont ter-118b
+#+end_src
+Edit /etc/rc.conf
+#+begin_example
+KEYMAP="us-acentos"
+FONT="ter-118b"
+#+end_example
 ** Add an admin user
 #+begin_src bash
   useradd -m -s /bin/bash -U -G wheel lefty
@@ -170,7 +208,7 @@ install_items+=" /boot/volume.key /etc/crypttab "
   xbps-install void-repo-nonfree
   xbps-install -S
 #+end_src
-** Change to a faster repository
+** Change to a faster repository mirror
 *** /etc/xbps.d/00-repository-main.conf
 #+begin_example
 # repository=https://repo-default.voidlinux.org/current
@@ -185,12 +223,6 @@ repository=https://repo-de.voidlinux.org/current/nonfree
 #+begin_src bash
   xbps-install -S
 #+end_src
-** Console font and keymap
-Edit /etc/rc.conf
-#+begin_example
-KEYMAP=us-acentos
-FONT="ter-118b"
-#+end_example
 ** Timezone
 #+begin_src bash
   ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime
@@ -204,6 +236,7 @@ ignorepkg=linux-headers
 #+begin_src bash
   xbps-install linux-lts linux-lts-headers
   xbps-remove linux linux-headers
+  xbps-remove -Ro
   update-grub
 #+end_src
 ** Do not install helvetica fonts
@@ -224,6 +257,10 @@ ignorepkg=font-adobe-utopia-type1
 #+begin_src bash
   xbps-install $(cat ~/packages.txt)
 #+end_src
+or
+#+begin_src bash
+  xbps-install adwaita-qt alsa-pipewire alsa-utils asciinema barrier barrier-gui base-devel base-system bash-completion bc breeze breeze-gtk breeze-icons buku cairo-devel calibre ccache chrony clang clang-tools-extra cmake cmst cmus cmus-pulseaudio conky connman-gtk cryptsetup dbus deadbeef dfu-util dict djvulibre dolphin dosbox-staging dunst elogind emacs-gtk3 enigma esptool evtest feh filelight firefox-esr font-hack-ttf font-inconsolata-otf fortune-mod fortune-mod-void fuse-sshfs geany ghostscript gimp git gkrellm glxinfo gmrun gnome-icon-theme gnome-themes-extra gnome-themes-extra-gtk gnuchess gperf grub grub-x86_64-efi hdparm htop hunspell hunspell-en_US hunspell-pt_BR ImageMagick inkscape iperf3 juliaup kate5 kcolorchooser kde-gtk-config5 kicad kicad-footprints kicad-library kicad-symbols kicad-templates knights kpat ktorrent liberation-fonts-ttf libpng-devel libreoffice-calc libreoffice-gnome libreoffice-kde libreoffice-writer librepcb libva-utils libvterm linux-lts linux-lts-headers lvm2 lxappearance make man-pages-devel man-pages-posix mc mesa-demos mpv neofetch net-tools ninja nmap obconf obmenu-generator okteta okular openbox pamixer parcellite pavucontrol picom pipewire pkgconf plocate podman polkit-elogind polkit-kde-agent poppler-devel poppler-glib-devel psmisc pulsemixer python3-pip python3-virtualenv qalculate qemu qemu-ga qiv qt5ct ripgrep rofi rsync rxvt-unicode slock socklog-void sound-theme-freedesktop spectacle spice-vdagent synergy sysbench terminus-font the_silver_searcher tint2 tio tmux tree ttf-opensans vdpauinfo void-repo-nonfree volumeicon wget whois wmctrl xbindkeys xcape xclip xdg-desktop-portal xdg-desktop-portal-gtk xdg-user-dirs xdg-utils xdotool xf86-video-qxl xinit xmag xorg xterm xtermcontrol xtools yt-dlp zig zile zlib-devel
+#+end_src
 ** Services
 #+begin_src bash
   # ln -s /etc/sv/sshd /var/service
@@ -232,6 +269,10 @@ ignorepkg=font-adobe-utopia-type1
   ln -s /etc/sv/nanoklogd /var/service
   ln -s /etc/sv/polkitd /var/service
   ln -s /etc/sv/socklog-unix /var/service
+#+end_src
+For physical hosts, enable the chronyd service
+#+begin_src bash
+  ln -s /etc/sv/chronyd /var/service/
 #+end_src
 ** Release user's full power
 #+begin_src bash
@@ -242,6 +283,10 @@ ignorepkg=font-adobe-utopia-type1
 - ~/.ssh/config
 - ~/.ssh/github_rsa
 - ~/.ssh/github_rsa.pub
+** Test github key
+#+begin_src bash
+  ssh -T git@github.com
+#+end_src
 ** Clone dotfiles repository
 #+begin_src bash
   git clone git@github.com:energos/dotfiles
@@ -319,6 +364,11 @@ ignorepkg=font-adobe-utopia-type1
   mkdir -p .local/share/applications
 #+end_src
 * Housekeeping
+** Connman
+#+begin_src bash
+  rm /var/service/dhcpcd
+  ln -s /etc/sv/connman /var/service
+#+end_src
 ** Firefox
 #+begin_src bash
   cd $YOUR_FIREFOX_PROFILE
@@ -345,11 +395,52 @@ ignorepkg=font-adobe-utopia-type1
   # for i in Work/dotfiles/emacs/themes/*; do ln -s ../../$i .emacs.d/themes/$(basename $i); done
   ln -s ../Work/dotfiles/emacs/init.el .emacs.d/init.el
 #+end_src
+*** pdf-tools and vterm compile dependencies
+#+begin_src bash
+  xbps-install autoconf automake libpng-devel poppler-devel poppler-glib-devel zlib-devel make cmake pkgconf cairo-devel
+#+end_src
 ** Fonts
 #+begin_src bash
-mkdir -p .local/share/fonts
-ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
+  mkdir -p .local/share/fonts
+  ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
 #+end_src
+** Qemu Guest
+#+begin_src bash
+  xbps-install spice-vdagent qemu-ga
+  ln -s /etc/sv/qemu-ga /var/service
+  ln -s /etc/sv/spice-vdagentd /var/service
+#+end_src
+** Default applications
+#+begin_src bash
+  xdg-mime default geany.desktop text/plain
+  xdg-mime default geany.desktop text/x-shellscript
+  xdg-mime default org.kde.okular.desktop application/pdf
+  xdg-mime default org.kde.okular.desktop image/vnd.djvu
+  xdg-mime default org.kde.okular.desktop image/vnd.djvu+multipage
+  xdg-mime default qiv.desktop image/jpeg
+  xdg-mime default qiv.desktop image/png
+#+end_src
+#+begin_src bash
+  xdg-mime query default text/plain
+  xdg-mime query default text/x-shellscript
+  xdg-mime query default application/pdf
+  xdg-mime query default image/vnd.djvu
+  xdg-mime query default image/vnd.djvu+multipage
+  xdg-mime query default image/jpeg
+  xdg-mime query default image/png
+#+end_src
+* Unsorted links list
+- [[https://voidlinux.org/][Enter the void]]
+- [[https://animeshz.github.io/site/blogs/void-linux.html][Unmasking the hidden gems of Void Linux | Animesh Sahu]]
+- [[http://www.troubleshooters.com/linux/void/voidtips.htm][Void Linux Tips]]
+- [[http://www.troubleshooters.com/linux/void/quickinst.htm][Quick and Reliable Void Linux Installation]]
+- [[https://discussion.fedoraproject.org/t/pipewire-pulse-how-to-change-sound-sample-bell-window-system/70683][Pipewire 'pulse' how to change sound sample "bell-window-system" - Fedora Discussion]]
+- [[https://www.youtube.com/watch?v=2q98KbG-ng0][Void Linux Base Install on UEFI with LUKS Encryption. - YouTube]]
+- [[https://www.youtube.com/watch?v=wzX38PbPn3Q][Void Linux Encrypted (Full Disk Encryption). - YouTube]]
+- [[https://docs.voidlinux.org/installation/guides/fde.html][Full Disk Encryption - Void Linux Handbook]]
+- [[https://docs.voidlinux.org/installation/guides/chroot.html][Installation via chroot (x86/x86_64/aarch64) - Void Linux Handbook]]
+- [[https://www.youtube.com/watch?v=Qdkng68598o][Void Linux - Base install and first steps - YouTube]]
+- [[https://askubuntu.com/questions/1335006/what-is-the-recommended-method-to-encrypt-the-home-directory-in-ubuntu-21-04][encryption - What is the recommended method to encrypt the home directory in Ubuntu 21.04? - Ask Ubuntu]]
 * TODO TODO
 ** Add to git repo
 - packages.txt
@@ -361,11 +452,23 @@ ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
   + 99-helvetica.conf
 ** Icons
 - 512_void.webp / os-logo.png
-** default applications
 ** .desktop
 ** books
 ** datasheets
 ** eagle
 ** arduino
 ** esp-idf
-** connman
+** distrobox/eagle
+** dosbox
+** Services: Enable or not?
+- /etc/sv/alsa
+- /etc/sv/elogind
+** Bad xmodmap keys behaviour
+- [[https://gitlab.freedesktop.org/spice/spice/-/issues/66#note_1197486][CapsLock is sent twice when binded to ESC on the host. (#66) · Issues · spice / spice · GitLab]]
+- [[https://wyatt8740.github.io/site/blog/005_006.html][Wyatt's Blog: Unicomp Mini M Review, Keyboard Remapping]]
+- [[http://xahlee.info/linux/linux_xmodmap_f13_f14_f15.html][Linux: xmodmap: Set F13 F14 F15 Keys]]
+- [[https://forum.manjaro.org/t/strange-default-configuration-for-f13-f24-keys/88879][Strange default configuration for F13 - F24 keys - Support / KDE Plasma - Manjaro Linux Forum]]
+- [[https://www.reddit.com/r/linuxquestions/comments/r9w8yh/disable_function_keys_beyond_f12/][disable function keys beyond "f12"? : r/linuxquestions]]
+** spice-vdagent auto video resize does not work
+FFS, enable "Auto resize VM with window"!
+** disable logs if running from pendrive
