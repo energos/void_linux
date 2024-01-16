@@ -158,7 +158,7 @@ GRUB_GFXMODE=1920x1080x32
 GRUB_FONT="/boot/grub/fonts/terminus28b.pf2"
 #+end_example
 *** /etc/grub.d/40_custom
-#+begin_src bash
+#+begin_example
 #!/bin/sh
 exec tail -n +3 $0
 # This file provides an easy way to add custom menu entries.  Simply type the
@@ -183,7 +183,7 @@ menuentry "System shutdown" {
         echo "System shutting down..."
         halt
 }
-#+end_src
+#+end_example
 ** LUKS key
 #+begin_src bash
   dd bs=1 count=64 if=/dev/urandom of=/boot/volume.key
@@ -293,7 +293,7 @@ or
 #+end_src
 or exclude some big fat packages
 #+begin_src bash
-xbps-install $(grep -Ev "kicad|zig|qemu|calibre|libreoffice|inkscape|librepcb|gimp" ~/packages.txt)
+  xbps-install $(grep -Ev "kicad|zig|qemu|calibre|libreoffice|inkscape|librepcb|gimp" ~/packages.txt)
 #+end_src
 ** Services
 #+begin_src bash
@@ -306,7 +306,7 @@ xbps-install $(grep -Ev "kicad|zig|qemu|calibre|libreoffice|inkscape|librepcb|gi
 #+end_src
 For physical hosts, enable the chronyd service
 #+begin_src bash
-  ln -s /etc/sv/chronyd /var/service/
+  ln -s /etc/sv/chronyd /var/service
 #+end_src
 ** Release user's full power
 #+begin_src bash
@@ -398,10 +398,15 @@ For physical hosts, enable the chronyd service
   mkdir -p .local/share/applications
 #+end_src
 * Housekeeping
+** Fonts
+#+begin_src bash
+  mkdir -p .local/share/fonts
+  ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
+#+end_src
 ** Connman
 #+begin_src bash
   rm /var/service/dhcpcd
-  ln -s /etc/sv/connman /var/service
+  ln -s /etc/sv/connmand /var/service
 #+end_src
 ** Firefox
 #+begin_src bash
@@ -432,11 +437,6 @@ For physical hosts, enable the chronyd service
 *** pdf-tools and vterm compile dependencies
 #+begin_src bash
   xbps-install autoconf automake libpng-devel poppler-devel poppler-glib-devel zlib-devel make cmake pkgconf cairo-devel
-#+end_src
-** Fonts
-#+begin_src bash
-  mkdir -p .local/share/fonts
-  ln -s ../../../Work/dotfiles/fonts/Iosevka .local/share/fonts/Iosevka
 #+end_src
 ** Qemu Guest
 #+begin_src bash
