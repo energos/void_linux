@@ -419,6 +419,12 @@ For physical hosts, enable the chronyd service
   ln -s ../../../../Work/dotfiles/mozilla/userContent.css chrome/userContent.css
   cd ~
 #+end_src
+- Install [[https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/][uBlock Origin]] addon
+  + From uBlock dashboard tab "My filters" import [[https://github.com/energos/dotfiles/blob/master/mozilla/ublock-my-filters.txt][ublock-my-filters.txt]]
+- Install [[https://addons.mozilla.org/en-US/firefox/addon/link-text-and-location-copier/][Link Text and Location Copier]] addon
+  + From the addon preferences import [[https://github.com/energos/dotfiles/blob/master/mozilla/link-text-location-copier.json][link-text-location-copier.json]]
+- Install [[https://addons.mozilla.org/en-US/firefox/addon/cookie-autodelete/][Cookie AutoDelete]] addon
+- Install [[https://addons.mozilla.org/en-US/firefox/addon/onetab/][OneTab]] addon
 ** /etc/hosts
 #+begin_example
 192.168.x.xx1           moe
