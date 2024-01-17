@@ -87,7 +87,7 @@ LABEL=DUMPSTER,    UUID=EDD6-9199
 #+end_src
 ** Install base system
 #+begin_src bash
-  xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc terminus-font xtools bash-completion
+  xbps-install -Sy -R https://repo-de.voidlinux.org/current -r /mnt base-system cryptsetup grub-x86_64-efi lvm2 zile tmux mc terminus-font xtools bash-completion rxvt-unicode-terminfo
 #+end_src
 ** Enter the chroot
 #+begin_src bash
@@ -308,6 +308,13 @@ For physical hosts, enable the chronyd service
 #+begin_src bash
   ln -s /etc/sv/chronyd /var/service
 #+end_src
+** /etc/hosts
+#+begin_example
+192.168.x.xx1           moe
+192.168.x.xx2           larry
+192.168.x.xx3           curly
+192.168.x.xx4           shemp
+#+end_example
 ** Release user's full power
 #+begin_src bash
   usermod -a -G wheel,users,audio,video,cdrom,input,dialout,kvm,plugdev,xbuilder,network,socklog lefty
@@ -406,8 +413,7 @@ For physical hosts, enable the chronyd service
 #+end_src
 ** Connman
 #+begin_src bash
-  rm /var/service/dhcpcd
-  ln -s /etc/sv/connmand /var/service
+  rm /var/service/dhcpcd && ln -s /etc/sv/connmand /var/service
 #+end_src
 ** Firefox
 #+begin_src bash
@@ -426,13 +432,6 @@ For physical hosts, enable the chronyd service
   + From the addon preferences import [[https://github.com/energos/dotfiles/blob/master/mozilla/link-text-location-copier.json][link-text-location-copier.json]]
 - Install [[https://addons.mozilla.org/en-US/firefox/addon/cookie-autodelete/][Cookie AutoDelete]] addon
 - Install [[https://addons.mozilla.org/en-US/firefox/addon/onetab/][OneTab]] addon
-** /etc/hosts
-#+begin_example
-192.168.x.xx1           moe
-192.168.x.xx2           larry
-192.168.x.xx3           curly
-192.168.x.xx4           shemp
-#+end_example
 ** Emacs
 #+begin_src bash
   mkdir -p .emacs.d/lisp
@@ -460,6 +459,7 @@ For physical hosts, enable the chronyd service
   xdg-mime default org.kde.okular.desktop image/vnd.djvu+multipage
   xdg-mime default qiv.desktop image/jpeg
   xdg-mime default qiv.desktop image/png
+  xdg-mime default qiv.desktop image/svg+xml
 #+end_src
 #+begin_src bash
   xdg-mime query default text/plain
@@ -469,6 +469,7 @@ For physical hosts, enable the chronyd service
   xdg-mime query default image/vnd.djvu+multipage
   xdg-mime query default image/jpeg
   xdg-mime query default image/png
+  xdg-mime query default image/svg+xml
 #+end_src
 * Unsorted links list
 - [[https://voidlinux.org/][Enter the void]]
