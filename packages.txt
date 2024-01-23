@@ -78,6 +78,7 @@ kicad-library
 kicad-symbols
 kicad-templates
 knights
+kompare
 kpat
 ktorrent
 liberation-fonts-ttf
@@ -85,6 +86,7 @@ libpng-devel
 libreoffice-calc
 libreoffice-gnome
 libreoffice-kde
+libreoffice-math
 libreoffice-writer
 librepcb
 libva-utils
