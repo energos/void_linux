@@ -11,6 +11,7 @@ bc
 breeze
 breeze-gtk
 breeze-icons
+brother-brlaser
 buku
 cairo-devel
 calibre
@@ -25,6 +26,9 @@ cmus-pulseaudio
 conky
 connman-gtk
 cryptsetup
+cups
+cups-filters
+cups-pk-helper
 dbus
 deadbeef
 dfu-util
@@ -43,6 +47,9 @@ filelight
 firefox-esr
 font-hack-ttf
 font-inconsolata-otf
+foomatic-db
+foomatic-db-engine
+foomatic-db-nonfree
 fortune-mod
 fortune-mod-void
 fuse-sshfs
@@ -142,6 +149,7 @@ spectacle
 spice-vdagent
 synergy
 sysbench
+system-config-printer
 terminus-font
 the_silver_searcher
 tint2

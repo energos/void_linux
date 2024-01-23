@@ -314,6 +314,7 @@ For physical hosts, enable the chronyd service
 192.168.x.xx2           larry
 192.168.x.xx3           curly
 192.168.x.xx4           shemp
+192.168.x.xx5           printer
 #+end_example
 ** Release user's full power
 #+begin_src bash
@@ -471,6 +472,25 @@ For physical hosts, enable the chronyd service
   xdg-mime query default image/png
   xdg-mime query default image/svg+xml
 #+end_src
+** Install printer (Brother HL-1212W)
+#+begin_src bash
+  xbps-install cups cups-pk-helper cups-filters foomatic-db foomatic-db-nonfree foomatic-db-engine brother-brlaser system-config-printer
+  usermod -a -G lpadmin lefty
+  ln -s /etc/sv/cupsd /var/service
+#+end_src
+As normal user:
+#+begin_src bash
+  system-config-printer
+#+end_src
+- Unlock
+- Add
+  + Network Printer
+    - Find Network Printer
+    - Host: printer ip <- Find
+      + IPP Printer <- Forward
+        - Brother (recommended) <- Forward
+          + HL-1200 (recommended) <- Forward
+    - Describe Printer <- Apply
 * Unsorted links list
 - [[https://voidlinux.org/][Enter the void]]
 - [[https://animeshz.github.io/site/blogs/void-linux.html][Unmasking the hidden gems of Void Linux | Animesh Sahu]]
