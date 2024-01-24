@@ -491,6 +491,89 @@ As normal user:
         - Brother (recommended) <- Forward
           + HL-1200 (recommended) <- Forward
     - Describe Printer <- Apply
+** Add new partitions
+Add one encrypted and one non encripted partitions
+#+begin_example
+# fdisk -l /dev/sdd
+Disk /dev/sdd: 57.3 GiB, 61524148224 bytes, 120164352 sectors
+Disk model:  SanDisk 3.2Gen1
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: C72FEC1F-83A2-8743-B323-089A0D0B6410
+
+Device         Start       End  Sectors  Size Type
+/dev/sdd1       2048     10239     8192    4M EFI System
+/dev/sdd2      10240  60086271 60076032 28.6G Linux filesystem
+/dev/sdd3   60086272 114612223 54525952   26G Linux filesystem
+/dev/sdd4  114612224 120162303  5550080  2.6G Linux filesystem
+#+end_example
+#+begin_src bash
+  cryptsetup luksFormat /dev/sdd3
+  cryptsetup luksAddKey /dev/sdd3 /boot/volume.key
+
+  cryptsetup luksOpen /dev/sdd3 homevm
+
+  vgcreate homevm /dev/mapper/homevm
+
+  lvcreate --name swap -L 2G homevm
+  lvcreate --name home -l 100%FREE homevm
+
+  mkswap -L SWAP /dev/homevm/swap
+  mkfs.ext4 -O "^has_journal" -L WilburyHome /dev/homevm/home
+  mkfs.ext4 -O "^has_journal" -L Dumpster /dev/sdd4
+#+end_src
+#+begin_example
+# lsblk /dev/sdd -f
+NAME              FSTYPE      FSVER    LABEL       UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+sdd
+├─sdd1            vfat        FAT12    EFI         6D6C-D46B                                 3.7M     6% /boot/efi
+├─sdd2            crypto_LUKS 1                    d0a9cd6f-71e1-4b71-9edd-616f9b7b8e0f
+│ └─voidvm        LVM2_member LVM2 001             LYM6Ab-fdzr-uDBC-p03X-1QMT-cw05-vFuIvG
+│   └─voidvm-root ext4        1.0      WilburyRoot a7650d90-9fdc-45d5-aced-86ba24850eb5        6G    73% /
+├─sdd3            crypto_LUKS 2                    7d672eb4-beae-4aa4-83ac-eb452605292d
+│ └─homevm        LVM2_member LVM2 001             mY09x3-rKWv-NnJI-0PXH-rmyo-CcVG-VImHL0
+│   ├─homevm-swap swap        1        SWAP        ca8283b3-3ea3-4bcb-b368-ab96731e00d9                  [SWAP]
+│   └─homevm-home ext4        1.0      WilburyHome b60fbb98-ae90-4a3d-85d7-3f3513240f2a     22.3G     0% /mnt/Home
+└─sdd4            ext4        1.0      Dumpster    37fa3856-cbee-4446-9a97-23da0674c106      2.4G     0% /mnt/Dumpster
+#+end_example
+/etc/fstab
+#+begin_example
+#
+# See fstab(5).
+#
+# <file system>      <dir>     <type>  <options>               <dump> <pass>
+tmpfs                /tmp      tmpfs   defaults,nosuid,nodev   0      0
+
+/dev/voidvm/root     /         ext4    defaults,noatime,shared 0      1
+
+/dev/homevm/home     /mnt/Home ext4    defaults,noatime,shared 0      2
+/dev/homevm/swap     swap      swap    defaults                0      0
+
+UUID=37fa3856-cbee-4446-9a97-23da0674c106 /mnt/Dumpster ext4  defaults,noatime,shared 0 2
+
+UUID=6D6C-D46B       /boot/efi vfat    defaults                0      2
+#+end_example
+/etc/crypttab
+#+begin_example
+# crypttab: mappings for encrypted partitions
+#
+# Each mapped device will be created in /dev/mapper, so your /etc/fstab
+# should use the /dev/mapper/<name> paths for encrypted devices.
+#
+# NOTE: Do not list your root (/) partition here.
+
+# <name>       <device>         <password>              <options>
+# home         /dev/hda4        /etc/mypassword1
+# data1        /dev/hda3        /etc/mypassword2
+# data2        /dev/hda5        /etc/cryptfs.key
+# swap         /dev/hdx4        /dev/urandom            swap,cipher=aes-cbc-essiv:sha256,size=256
+# vol          /dev/hdb7        none
+
+voidvm   UUID=d0a9cd6f-71e1-4b71-9edd-616f9b7b8e0f  /boot/volume.key  luks
+homevm   UUID=7d672eb4-beae-4aa4-83ac-eb452605292d  /boot/volume.key  luks
+#+end_example
 * Unsorted links list
 - [[https://voidlinux.org/][Enter the void]]
 - [[https://animeshz.github.io/site/blogs/void-linux.html][Unmasking the hidden gems of Void Linux | Animesh Sahu]]

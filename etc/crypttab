@@ -1,0 +1,16 @@
+# crypttab: mappings for encrypted partitions
+#
+# Each mapped device will be created in /dev/mapper, so your /etc/fstab
+# should use the /dev/mapper/<name> paths for encrypted devices.
+#
+# NOTE: Do not list your root (/) partition here.
+
+# <name>       <device>         <password>              <options>
+# home         /dev/hda4        /etc/mypassword1
+# data1        /dev/hda3        /etc/mypassword2
+# data2        /dev/hda5        /etc/cryptfs.key
+# swap         /dev/hdx4        /dev/urandom            swap,cipher=aes-cbc-essiv:sha256,size=256
+# vol          /dev/hdb7        none
+
+voidvm   UUID=d0a9cd6f-71e1-4b71-9edd-616f9b7b8e0f  /boot/volume.key  luks
+homevm   UUID=7d672eb4-beae-4aa4-83ac-eb452605292d  /boot/volume.key  luks

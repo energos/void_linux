@@ -1,0 +1,14 @@
+#
+# See fstab(5).
+#
+# <file system>      <dir>     <type>  <options>               <dump> <pass>
+tmpfs                /tmp      tmpfs   defaults,nosuid,nodev   0      0
+
+/dev/voidvm/root     /         ext4    defaults,noatime,shared 0      1
+
+/dev/homevm/home     /mnt/Home ext4    defaults,noatime,shared 0      2
+/dev/homevm/swap     swap      swap    defaults                0      0
+
+UUID=37fa3856-cbee-4446-9a97-23da0674c106 /mnt/Dumpster ext4  defaults,noatime,shared 0 2
+
+UUID=6D6C-D46B       /boot/efi vfat    defaults                0      2
