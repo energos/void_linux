@@ -574,6 +574,17 @@ UUID=6D6C-D46B       /boot/efi vfat    defaults                0      2
 voidvm   UUID=d0a9cd6f-71e1-4b71-9edd-616f9b7b8e0f  /boot/volume.key  luks
 homevm   UUID=7d672eb4-beae-4aa4-83ac-eb452605292d  /boot/volume.key  luks
 #+end_example
+* Issues
+** Constant ACPI events in log
+#+begin_example
+2024-01-29T03:50:52.93535 user.notice: Jan 29 00:50:52 root: ACPI group/action undefined: jack/lineout / LINEOUT
+2024-01-29T03:50:52.94007 user.notice: Jan 29 00:50:52 root: ACPI group/action undefined: jack/videoout / VIDEOOUT
+#+end_example
+/etc/acpi/events/jack-drop
+#+begin_example
+event=jack/*
+action=<drop>
+#+end_example
 * Unsorted links list
 - [[https://voidlinux.org/][Enter the void]]
 - [[https://animeshz.github.io/site/blogs/void-linux.html][Unmasking the hidden gems of Void Linux | Animesh Sahu]]
