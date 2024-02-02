@@ -472,6 +472,32 @@ For physical hosts, enable the chronyd service
   xdg-mime query default image/png
   xdg-mime query default image/svg+xml
 #+end_src
+** distrobox/eagle
+#+begin_src bash
+  git clone -b 1.6.0.1 https://github.com/89luca89/distrobox.git
+  cd distrobox
+  ./install
+#+end_src
+#+begin_src sh
+  distrobox create --image docker.io/library/ubuntu:16.04 --name ubuntu16
+  distrobox list
+  distrobox enter ubuntu16
+  # distrobox stop ubuntu16
+  # distrobox rm ubuntu16
+#+end_src
+#+begin_src sh
+  dpkg --add-architecture i386
+  apt update
+  apt upgrade
+  apt-get --no-install-recommends install bash-completion file git mg mc tmux rxvt-unicode-256color xterm xtermcontrol man-db manpages manpages-dev locales psmisc patch rsync ssh-client shared-mime-info xdg-user-dirs mime-support unzip netbase rename ttf-dejavu
+  apt install eagle
+#+end_src
+#+begin_verse
+distrobox list
+WARN[0000] "/" is not a shared mount, this could cause issues or missing mounts with rootless containers
+
+# add "shared" to / options in /etc/fstab
+#+end_verse
 ** Install printer (Brother HL-1212W)
 #+begin_src bash
   xbps-install cups cups-pk-helper cups-filters foomatic-db foomatic-db-nonfree foomatic-db-engine brother-brlaser system-config-printer
@@ -611,10 +637,8 @@ action=<drop>
 ** .desktop
 ** books
 ** datasheets
-** eagle
 ** arduino
 ** esp-idf
-** distrobox/eagle
 ** dosbox
 ** Services: Enable or not?
 - /etc/sv/alsa
