@@ -500,7 +500,7 @@ WARN[0000] "/" is not a shared mount, this could cause issues or missing mounts 
 #+end_verse
 ** Install printer (Brother HL-1212W)
 #+begin_src bash
-  xbps-install cups cups-pk-helper cups-filters foomatic-db foomatic-db-nonfree foomatic-db-engine brother-brlaser system-config-printer
+  xbps-install cups cups-pk-helper cups-filters brother-brlaser system-config-printer
   usermod -a -G lpadmin lefty
   ln -s /etc/sv/cupsd /var/service
 #+end_src
