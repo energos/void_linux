@@ -492,12 +492,12 @@ For physical hosts, enable the chronyd service
   apt-get --no-install-recommends install bash-completion file git mg mc tmux rxvt-unicode-256color xterm xtermcontrol man-db manpages manpages-dev locales psmisc patch rsync ssh-client shared-mime-info xdg-user-dirs mime-support unzip netbase rename ttf-dejavu
   apt install eagle
 #+end_src
-#+begin_verse
+#+begin_example
 distrobox list
 WARN[0000] "/" is not a shared mount, this could cause issues or missing mounts with rootless containers
 
 # add "shared" to / options in /etc/fstab
-#+end_verse
+#+end_example
 ** Install printer (Brother HL-1212W)
 #+begin_src bash
   xbps-install cups cups-pk-helper cups-filters brother-brlaser system-config-printer
