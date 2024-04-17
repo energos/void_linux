@@ -33,6 +33,7 @@ dbus
 deadbeef
 dfu-util
 dict
+difftastic
 djvulibre
 dolphin
 dosbox-staging
@@ -117,6 +118,8 @@ obmenu-generator
 okteta
 okular
 openbox
+openresolv
+openvpn
 pamixer
 parcellite
 pavucontrol
@@ -129,7 +132,6 @@ polkit-elogind
 polkit-kde-agent
 poppler-devel
 poppler-glib-devel
-protonvpn-cli
 psmisc
 pulsemixer
 python3-pip
